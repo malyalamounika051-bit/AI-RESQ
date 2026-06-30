@@ -4,6 +4,8 @@ import TopNav from './components/TopNav';
 import MapModule from './components/MapModule';
 import AgentConsole from './components/AgentConsole';
 import ChatAssistant from './components/ChatAssistant';
+import MissingPersons from './components/MissingPersons';
+import DisasterTimeline from './components/DisasterTimeline';
 import GovernmentDashboard from './dashboards/GovernmentDashboard';
 import CitizenDashboard from './dashboards/CitizenDashboard';
 import VolunteerDashboard from './dashboards/VolunteerDashboard';
@@ -55,6 +57,10 @@ export const App: React.FC = () => {
         return renderDashboardByRole();
       case 'agents':
         return <AgentConsole agentStatuses={agentStatuses} />;
+      case 'timeline':
+        return <DisasterTimeline />;
+      case 'missing':
+        return <MissingPersons />;
       case 'chat':
         return <ChatAssistant />;
       default:

@@ -6,7 +6,9 @@ import {
   MessageSquare, 
   LayoutDashboard, 
   Layers, 
-  UserCheck 
+  UserCheck,
+  UserX,
+  Clock
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -35,6 +37,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'map', label: 'Live GIS Map', icon: Map },
     { id: 'dashboard', label: 'Role Analytics', icon: LayoutDashboard },
     { id: 'agents', label: 'AI Agent Console', icon: Cpu },
+    { id: 'timeline', label: 'Action Timeline', icon: Clock },
+    { id: 'missing', label: 'Missing Persons Portal', icon: UserX },
     { id: 'chat', label: 'Citizen Chat Assistant', icon: MessageSquare },
   ];
 

@@ -325,3 +325,125 @@ export const AGENT_CONFIGS: AgentConfig[] = [
   { name: 'Reporting Agent', role: 'Compliance & Summary Documenter', goal: 'Generate standard Situation Reports (SITREPs) and analytics charts for NGOs and governments.', status: 'IDLE', avatarColor: '#6b7280' },
   { name: 'Compliance Agent', role: 'Ethical Guardrail & Fact Validator', goal: 'Filter incoming reports to verify authenticity, prevent rumors, and enforce data privacy standards.', status: 'IDLE', avatarColor: '#4b5563' },
 ];
+
+// ========== NEW: Missing Persons ==========
+export interface MissingPerson {
+  id: string;
+  fullName: string;
+  age: number;
+  gender: 'Male' | 'Female' | 'Other';
+  lastSeenLocation: string;
+  lastSeenTime: string;
+  description: string;
+  contactPhone: string;
+  photoPlaceholder: string;
+  status: 'MISSING' | 'FOUND' | 'UNDER_INVESTIGATION';
+  reportedAt: string;
+}
+
+export const INITIAL_MISSING_PERSONS: MissingPerson[] = [
+  {
+    id: 'mp-1',
+    fullName: 'Ravi Shankar',
+    age: 67,
+    gender: 'Male',
+    lastSeenLocation: 'Kosi River embankment near village Bhagalpur',
+    lastSeenTime: '2026-06-30T08:30:00Z',
+    description: 'Elderly man, grey hair, wearing white kurta and brown sandals. Uses a wooden walking stick.',
+    contactPhone: '+91-98765-11111',
+    photoPlaceholder: 'RS',
+    status: 'MISSING',
+    reportedAt: '2026-06-30T10:15:00Z',
+  },
+  {
+    id: 'mp-2',
+    fullName: 'Meera Devi',
+    age: 34,
+    gender: 'Female',
+    lastSeenLocation: 'Near Balika Vidyalaya shelter entrance',
+    lastSeenTime: '2026-06-30T11:00:00Z',
+    description: 'Woman with two children (ages 5 and 8). Wearing red saree. Last seen moving towards higher ground.',
+    contactPhone: '+91-98765-22222',
+    photoPlaceholder: 'MD',
+    status: 'UNDER_INVESTIGATION',
+    reportedAt: '2026-06-30T12:00:00Z',
+  },
+  {
+    id: 'mp-3',
+    fullName: 'Arjun Patel',
+    age: 12,
+    gender: 'Male',
+    lastSeenLocation: 'District Indoor Stadium Shelter',
+    lastSeenTime: '2026-06-30T14:00:00Z',
+    description: 'Young boy, school uniform (blue shirt, grey trousers), carrying a green backpack.',
+    contactPhone: '+91-98765-33333',
+    photoPlaceholder: 'AP',
+    status: 'FOUND',
+    reportedAt: '2026-06-30T14:30:00Z',
+  },
+];
+
+// ========== NEW: SOS Signals ==========
+export interface SOSSignal {
+  id: string;
+  citizenName: string;
+  latitude: number;
+  longitude: number;
+  message: string;
+  urgency: 'CRITICAL' | 'HIGH' | 'MEDIUM';
+  status: 'PENDING' | 'DISPATCHED' | 'RESOLVED';
+  timestamp: string;
+}
+
+export const INITIAL_SOS_SIGNALS: SOSSignal[] = [
+  {
+    id: 'sos-1',
+    citizenName: 'Anonymous Citizen',
+    latitude: 26.14,
+    longitude: 86.83,
+    message: 'Family of 4 stranded on rooftop. Water level rising rapidly. Need boat rescue.',
+    urgency: 'CRITICAL',
+    status: 'DISPATCHED',
+    timestamp: '2026-06-30T11:30:00Z',
+  },
+];
+
+// ========== NEW: Notifications ==========
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'ALERT' | 'INFO' | 'SUCCESS' | 'SOS';
+  isRead: boolean;
+  timestamp: string;
+}
+
+export const INITIAL_NOTIFICATIONS: Notification[] = [
+  { id: 'notif-1', title: 'Evacuation Order Issued', message: 'Kosi basin evacuation order activated by District Collector.', type: 'ALERT', isRead: false, timestamp: '2026-06-30T10:15:00Z' },
+  { id: 'notif-2', title: 'NDRF Battalion Deployed', message: 'Battalion 09 aquatic rescue team has been dispatched to sector.', type: 'SUCCESS', isRead: false, timestamp: '2026-06-30T10:30:00Z' },
+  { id: 'notif-3', title: 'Blood Bank Alert', message: 'Sadar District Hospital blood bank status changed to LOW.', type: 'ALERT', isRead: true, timestamp: '2026-06-30T11:00:00Z' },
+  { id: 'notif-4', title: 'Shelter Capacity Warning', message: 'Balika Vidyalaya shelter approaching 90% capacity.', type: 'INFO', isRead: false, timestamp: '2026-06-30T11:45:00Z' },
+];
+
+// ========== NEW: Timeline Events ==========
+export interface TimelineEvent {
+  id: string;
+  timestamp: string;
+  title: string;
+  description: string;
+  category: 'DETECTION' | 'EVACUATION' | 'RESCUE' | 'MEDICAL' | 'RESOURCE' | 'RESOLVED';
+  severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  agentName?: string;
+}
+
+export const INITIAL_TIMELINE_EVENTS: TimelineEvent[] = [
+  { id: 'tl-1', timestamp: '2026-06-30T09:45:00Z', title: 'Abnormal Water Levels Detected', description: 'IoT river gauges report 340% above normal flow rate at Kosi embankment sensor array.', category: 'DETECTION', severity: 'HIGH', agentName: 'Monitoring Agent' },
+  { id: 'tl-2', timestamp: '2026-06-30T10:00:00Z', title: 'Flood Event Confirmed', description: 'Multi-sensor triangulation confirms Category 3 flood event. Confidence: 98.4%.', category: 'DETECTION', severity: 'CRITICAL', agentName: 'Monitoring Agent' },
+  { id: 'tl-3', timestamp: '2026-06-30T10:15:00Z', title: 'Evacuation Alert Broadcast', description: 'District-wide emergency broadcast issued to 45,000+ residents in low-lying areas.', category: 'EVACUATION', severity: 'CRITICAL', agentName: 'Decision Support Agent' },
+  { id: 'tl-4', timestamp: '2026-06-30T10:30:00Z', title: 'NDRF Rescue Teams Dispatched', description: 'Battalion 09 aquatic rescue (45 personnel) deployed via high-elevation highway.', category: 'RESCUE', severity: 'HIGH', agentName: 'Rescue Agent' },
+  { id: 'tl-5', timestamp: '2026-06-30T11:00:00Z', title: 'Emergency Rations Dispatched', description: '3,800 food ration packets dispatched to shelter nodes sh-1 and sh-2.', category: 'RESOURCE', severity: 'MEDIUM', agentName: 'Resource Allocation Agent' },
+  { id: 'tl-6', timestamp: '2026-06-30T11:30:00Z', title: 'Citizen SOS Received', description: 'Family of 4 stranded on rooftop. Speedboat unit redirected. ETA: 12 minutes.', category: 'RESCUE', severity: 'CRITICAL', agentName: 'Citizen Assistance Agent' },
+  { id: 'tl-7', timestamp: '2026-06-30T12:00:00Z', title: 'Blood Bank Critical Alert', description: 'Sadar District Hospital blood bank reserves depleted to critical levels.', category: 'MEDICAL', severity: 'HIGH', agentName: 'Healthcare Agent' },
+  { id: 'tl-8', timestamp: '2026-06-30T12:30:00Z', title: 'Western Ghats Fire Detected', description: 'Satellite imagery confirms wildfire ignition along ridge line near Wayanad settlements.', category: 'DETECTION', severity: 'MEDIUM', agentName: 'Monitoring Agent' },
+];
+

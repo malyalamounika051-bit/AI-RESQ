@@ -51,16 +51,13 @@ export const CitizenDashboard: React.FC = () => {
   };
 
   const handleTriggerSOS = () => {
-    db.addDisaster({
-      type: 'FLOOD',
-      title: 'CRITICAL CITIZEN SOS DISPATCH',
-      description: `Emergency distress signal triggered from active citizen portal. Rescue team deployment required.`,
-      severity: 'CRITICAL',
-      latitude: 26.16,
-      longitude: 86.84,
-      status: 'ACTIVE',
-      affectedPopulation: 1
-    });
+    db.addSOSSignal(
+      'Stranded Citizen (SOS)',
+      26.155 + (Math.random() - 0.5) * 0.02,
+      86.845 + (Math.random() - 0.5) * 0.02,
+      'URGENT: Flash flooding surrounding residence. Requesting immediate aerial evacuation rescue.',
+      'CRITICAL'
+    );
     alert('SOS Signal transmitted. The AI RESQ Agent Crew has received your geo-coordinates and dispatched the closest rescue unit.');
   };
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Bell, 
   RefreshCw, 
@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { db } from '../data/mockDatabase';
 import { executeSimulation } from '../data/agentSimulators';
+import NotificationCenter from './NotificationCenter';
 
 interface TopNavProps {
   onSimulationStarted: () => void;
@@ -22,7 +23,17 @@ export const TopNav: React.FC<TopNavProps> = ({
   setAgentStatuses
 }) => {
   const [isSimulating, setIsSimulating] = useState(false);
-  const [notifications, setNotifications] = useState<any[]>(db.getAlerts());
+  const [unreadCount, setUnreadCount] = useState(db.getUnreadCount());
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = db.subscribe(() => {
+      setUnreadCount(db.getUnreadCount());
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const handleSimulateDisaster = async (type: 'FLOOD' | 'CYCLONE' | 'EARTHQUAKE' | 'WILDFIRE') => {
     if (isSimulating) return;
@@ -60,7 +71,7 @@ export const TopNav: React.FC<TopNavProps> = ({
 
     setIsSimulating(false);
     onSimulationFinished();
-    setNotifications(db.getAlerts());
+    setUnreadCount(db.getUnreadCount());
   };
 
   const handleClearLogs = () => {
@@ -124,12 +135,20 @@ export const TopNav: React.FC<TopNavProps> = ({
 
         {/* Alerts Center Dropdown Indicator */}
         <div className="relative">
-          <button className="bg-slate-800/80 hover:bg-slate-800 text-slate-300 p-2.5 rounded-lg border border-slate-700 relative">
+          <button 
+            onClick={() => setIsNotifOpen(!isNotifOpen)}
+            className="bg-slate-800/80 hover:bg-slate-800 text-slate-300 p-2.5 rounded-lg border border-slate-700 relative cursor-pointer"
+          >
             <Bell className="w-4 h-4" />
-            {notifications.length > 0 && (
+            {unreadCount > 0 && (
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-ping" />
             )}
           </button>
+          
+          <NotificationCenter 
+            isOpen={isNotifOpen} 
+            onClose={() => setIsNotifOpen(false)} 
+          />
         </div>
       </div>
     </header>

@@ -7,6 +7,10 @@ import {
   INITIAL_RESOURCE_ALLOCATIONS,
   INITIAL_RESCUE_TEAMS,
   INITIAL_VOLUNTEERS,
+  INITIAL_MISSING_PERSONS,
+  INITIAL_SOS_SIGNALS,
+  INITIAL_NOTIFICATIONS,
+  INITIAL_TIMELINE_EVENTS,
   type Disaster,
   type Alert,
   type Shelter,
@@ -15,7 +19,11 @@ import {
   type ResourceAllocation,
   type RescueTeam,
   type Volunteer,
-  type AgentLog
+  type AgentLog,
+  type MissingPerson,
+  type SOSSignal,
+  type Notification,
+  type TimelineEvent
 } from './seedData';
 
 class MockDatabase {
@@ -28,6 +36,10 @@ class MockDatabase {
   private teams: RescueTeam[] = [...INITIAL_RESCUE_TEAMS];
   private volunteers: Volunteer[] = [...INITIAL_VOLUNTEERS];
   private agentLogs: AgentLog[] = [];
+  private missingPersons: MissingPerson[] = [...INITIAL_MISSING_PERSONS];
+  private sosSignals: SOSSignal[] = [...INITIAL_SOS_SIGNALS];
+  private notifications: Notification[] = [...INITIAL_NOTIFICATIONS];
+  private timelineEvents: TimelineEvent[] = [...INITIAL_TIMELINE_EVENTS];
   
   private listeners: Set<() => void> = new Set();
 
@@ -167,6 +179,91 @@ class MockDatabase {
   clearLogs() {
     this.agentLogs = [];
     this.notify();
+  }
+
+  // Missing Persons
+  getMissingPersons() { return this.missingPersons; }
+  addMissingPerson(p: Omit<MissingPerson, 'id' | 'reportedAt' | 'status'>) {
+    const newPerson: MissingPerson = {
+      ...p,
+      id: `mp-${Date.now()}`,
+      status: 'MISSING',
+      reportedAt: new Date().toISOString()
+    };
+    this.missingPersons.unshift(newPerson);
+    this.addNotification('Missing Person Report', `${p.fullName} reported missing near ${p.lastSeenLocation}.`, 'ALERT');
+    this.notify();
+    return newPerson;
+  }
+  updateMissingPersonStatus(id: string, status: MissingPerson['status']) {
+    this.missingPersons = this.missingPersons.map(p => p.id === id ? { ...p, status } : p);
+    this.notify();
+  }
+
+  // SOS Signals
+  getSOSSignals() { return this.sosSignals; }
+  addSOSSignal(citizenName: string, lat: number, lng: number, message: string, urgency: SOSSignal['urgency'] = 'CRITICAL') {
+    const signal: SOSSignal = {
+      id: `sos-${Date.now()}`,
+      citizenName,
+      latitude: lat,
+      longitude: lng,
+      message,
+      urgency,
+      status: 'PENDING',
+      timestamp: new Date().toISOString()
+    };
+    this.sosSignals.unshift(signal);
+    this.addNotification('🚨 SOS Signal Received', `${citizenName}: ${message}`, 'SOS');
+    this.addTimelineEvent('Citizen SOS Received', message, 'RESCUE', urgency === 'CRITICAL' ? 'CRITICAL' : 'HIGH', 'Citizen Assistance Agent');
+    this.notify();
+    return signal;
+  }
+  updateSOSStatus(id: string, status: SOSSignal['status']) {
+    this.sosSignals = this.sosSignals.map(s => s.id === id ? { ...s, status } : s);
+    this.notify();
+  }
+
+  // Notifications
+  getNotifications() { return this.notifications; }
+  addNotification(title: string, message: string, type: Notification['type'] = 'INFO') {
+    const notif: Notification = {
+      id: `notif-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      title,
+      message,
+      type,
+      isRead: false,
+      timestamp: new Date().toISOString()
+    };
+    this.notifications.unshift(notif);
+    this.notify();
+    return notif;
+  }
+  markNotificationRead(id: string) {
+    this.notifications = this.notifications.map(n => n.id === id ? { ...n, isRead: true } : n);
+    this.notify();
+  }
+  markAllNotificationsRead() {
+    this.notifications = this.notifications.map(n => ({ ...n, isRead: true }));
+    this.notify();
+  }
+  getUnreadCount() { return this.notifications.filter(n => !n.isRead).length; }
+
+  // Timeline
+  getTimelineEvents() { return this.timelineEvents; }
+  addTimelineEvent(title: string, description: string, category: TimelineEvent['category'], severity: TimelineEvent['severity'], agentName?: string) {
+    const event: TimelineEvent = {
+      id: `tl-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      title,
+      description,
+      category,
+      severity,
+      agentName
+    };
+    this.timelineEvents.unshift(event);
+    this.notify();
+    return event;
   }
 }
 

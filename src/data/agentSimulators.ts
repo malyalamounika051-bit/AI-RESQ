@@ -175,6 +175,31 @@ export const executeSimulation = async (
     
     db.addAgentLog(step.agentName, step.actionType, step.level, step.message);
     
+    // Feed the timeline events table
+    let category: 'DETECTION' | 'EVACUATION' | 'RESCUE' | 'MEDICAL' | 'RESOURCE' | 'RESOLVED' = 'DETECTION';
+    if (step.agentName === 'Planning Agent' || step.agentName === 'Shelter Agent') category = 'EVACUATION';
+    else if (step.agentName === 'Rescue Agent') category = 'RESCUE';
+    else if (step.agentName === 'Healthcare Agent') category = 'MEDICAL';
+    else if (step.agentName === 'Resource Allocation Agent') category = 'RESOURCE';
+    else if (step.agentName === 'Reporting Agent') category = 'RESOLVED';
+
+    db.addTimelineEvent(
+      `${step.agentName}: ${step.actionType.replace('_', ' ')}`,
+      step.message.substring(0, 150) + (step.message.length > 150 ? '...' : ''),
+      category,
+      step.level === 'ERROR' ? 'CRITICAL' : step.level === 'WARNING' ? 'HIGH' : 'MEDIUM',
+      step.agentName
+    );
+
+    // Push important alerts to Notification Center
+    if (step.level === 'WARNING' || step.level === 'DECISION') {
+      db.addNotification(
+        `Agent Update: ${step.agentName}`,
+        step.message,
+        step.level === 'WARNING' ? 'ALERT' : 'INFO'
+      );
+    }
+    
     onAgentChange(step.agentName, 'COMPLETED');
   }
 };

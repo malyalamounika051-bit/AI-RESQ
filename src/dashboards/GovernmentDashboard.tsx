@@ -216,6 +216,75 @@ export const GovernmentDashboard: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* NEW: SOS Dispatch Queue */}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-lg">
+        <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-950/20">
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-red-500 animate-pulse flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4" />
+              Live Citizen SOS Distress Feed
+            </h3>
+            <p className="text-[10px] text-slate-500">Urgent distress broadcasts mapped by coordinates.</p>
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="bg-slate-950 text-slate-400 font-bold uppercase border-b border-slate-800">
+                <th className="p-4">Urgency</th>
+                <th className="p-4">Reporter Name</th>
+                <th className="p-4">Coordinates</th>
+                <th className="p-4">Distress Message</th>
+                <th className="p-4">Status</th>
+                <th className="p-4">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800">
+              {db.getSOSSignals().map(sos => (
+                <tr key={sos.id} className="hover:bg-slate-800/30">
+                  <td className="p-4">
+                    <span className="bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-0.5 rounded text-[10px] font-bold">
+                      {sos.urgency}
+                    </span>
+                  </td>
+                  <td className="p-4 text-white font-bold">{sos.citizenName}</td>
+                  <td className="p-4 text-slate-400 font-mono">{sos.latitude.toFixed(4)}°N, {sos.longitude.toFixed(4)}°E</td>
+                  <td className="p-4 text-slate-300 leading-normal max-w-sm truncate">{sos.message}</td>
+                  <td className="p-4">
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                      sos.status === 'PENDING' ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20' : 
+                      sos.status === 'DISPATCHED' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 
+                      'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                    }`}>
+                      {sos.status}
+                    </span>
+                  </td>
+                  <td className="p-4">
+                    {sos.status === 'PENDING' ? (
+                      <button
+                        onClick={() => db.updateSOSStatus(sos.id, 'DISPATCHED')}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-2.5 py-1 rounded text-[11px] border border-indigo-700"
+                      >
+                        Dispatch Team
+                      </button>
+                    ) : sos.status === 'DISPATCHED' ? (
+                      <button
+                        onClick={() => db.updateSOSStatus(sos.id, 'RESOLVED')}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-2.5 py-1 rounded text-[11px] border border-emerald-700"
+                      >
+                        Mark Resolved
+                      </button>
+                    ) : (
+                      <span className="text-slate-500">Closed</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };
