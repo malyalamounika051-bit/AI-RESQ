@@ -15,67 +15,37 @@ export const generateSimulationSteps = (disasterId: string): SimulationStep[] =>
   if (!disaster) return [];
 
   const locationStr = `${disaster.latitude.toFixed(2)}°N, ${disaster.longitude.toFixed(2)}°E`;
+  const isEarthquake = disaster.type === 'EARTHQUAKE';
 
   return [
     {
-      agentName: 'Monitoring Agent',
-      actionType: 'RISK_DETECTION',
+      agentName: 'Weather Agent',
+      actionType: 'DISASTER_DETECTION',
       level: 'WARNING',
-      message: `ALERT: IoT telemetric trigger received. High flow threshold exceeded at sensor point. Location: ${locationStr}. Confirming hazard profile...`,
-      delay: 500
+      message: `ALERT: Meteorological sensors detect anomalous ${isEarthquake ? 'tectonic tremor activity (fault slip)' : 'heavy convective precipitation/runoff'}. Predicted Impact Location: ${locationStr}. Evaluating severity coefficient...`,
+      delay: 800
     },
     {
-      agentName: 'Monitoring Agent',
-      actionType: 'DISASTER_CONFIRMATION',
+      agentName: 'Weather Agent',
+      actionType: 'SEVERITY_CLASSIFICATION',
       level: 'DECISION',
-      message: `CONFIRMED: Autonomous sensor triangulation confirms ${disaster.type} event of ${disaster.severity} severity. Confidence rating: 98.4%. Time remaining to peak impact: 4.5 hours.`,
+      message: `OUTPUT: Disaster classification verified: ${disaster.type}. Severity: ${disaster.severity}. Time remaining to peak threshold impact: 5.2 hours. Initiating collaborative multi-agent response workflow...`,
       delay: 1000,
       effect: () => {
         db.addAlert(
           disasterId,
           disaster.severity === 'CRITICAL' || disaster.severity === 'HIGH' ? 'CRITICAL' : 'WARNING',
-          `AI RESQ Broadcast: A ${disaster.type} event (${disaster.severity}) has been confirmed at ${disaster.title}. Immediate precautionary measures advised.`
+          `Weather Agent Alert: ${disaster.type} event confirmed at ${disaster.title} with ${disaster.severity} severity.`
         );
       }
     },
     {
-      agentName: 'Information Retrieval Agent',
-      actionType: 'DATA_AGGREGATION',
-      level: 'INFO',
-      message: `COLLECTING DATA: Fetching local weather sensors, hospital database, shelter inventories, and active responder units within a 25km radius.`,
-      delay: 1200
-    },
-    {
-      agentName: 'Information Retrieval Agent',
-      actionType: 'DATA_SUMMARIZATION',
-      level: 'INFO',
-      message: `RETRIEVED: Found ${db.getShelters().length} operational shelters, ${db.getHospitals().length} medical centers, and ${db.getRescueTeams().length} regional responder teams. Querying live capacity...`,
-      delay: 1000
-    },
-    {
-      agentName: 'Planning Agent',
-      actionType: 'PREDICTIVE_MODELLING',
-      level: 'DECISION',
-      message: `EVACUATION STRATEGY: Computing hazard expansion radial. Estimated population in high-risk zones: ${disaster.affectedPopulation.toLocaleString()} citizens. Setting shelter thresholds.`,
-      delay: 1500
-    },
-    {
-      agentName: 'Decision Support Agent',
-      actionType: 'COMMAND_RANKING',
-      level: 'DECISION',
-      message: `PRIORITY ACTION PLAN GENERATED:
-- Evacuation Urgency: Level 9/10.
-- Key Actions: Dispatch Aquatic rescue teams, provision shelter sh-1 & sh-2, allocate 3,000+ food rations, standby Sadar District Hospital ICU beds.`,
-      delay: 1500
-    },
-    {
       agentName: 'Shelter Agent',
-      actionType: 'CAPACITY_MATCHING',
+      actionType: 'SHELTER_CAPACITY_PLANNING',
       level: 'DECISION',
-      message: `SHELTER CORRELATION: Directing evacuees to nearest shelter node. 'Balika Vidyalaya Relief Shelter' currently at 84% capacity. Preparing overflow routing to 'District Indoor Stadium Shelter'.`,
+      message: `OUTPUT: Safe shelter lookup completed. Nearest node: 'Balika Vidyalaya Relief Shelter' (capacity 500, currently 420 occupied). Rerouting overflow group of 50 evacuees to alternative: 'District Indoor Stadium Shelter' (capacity 1200, 650 occupied).`,
       delay: 1200,
       effect: () => {
-        // Increment occupancy to show agent shelter allocations
         const targetShelter = db.getShelters()[0];
         if (targetShelter) {
           db.updateShelterOccupancy(targetShelter.id, 50);
@@ -84,36 +54,36 @@ export const generateSimulationSteps = (disasterId: string): SimulationStep[] =>
     },
     {
       agentName: 'Resource Allocation Agent',
-      actionType: 'INVENTORY_OPTIMIZATION',
+      actionType: 'LOGISTICS_CALCULATOR',
       level: 'DECISION',
-      message: `LOGISTICS DISPATCH: Prioritizing allocation of emergency supplies based on population density. Allocating 1,500 food units and 2,000 water liters to shelter 'sh-2'.`,
-      delay: 1500,
+      message: `OUTPUT: Calculating supply demands based on affected population (${disaster.affectedPopulation.toLocaleString()}). Allocating: 2,500 food packets, 3,000L drinking water, 800 blankets, 350 emergency kits, and 6 rescue speedboats. Distribution priority index: HIGH.`,
+      delay: 1200,
       effect: () => {
         const resources = db.getResources();
         const food = resources.find(r => r.category === 'FOOD_WATER');
         if (food) {
-          db.allocateResource(disasterId, food.id, 1000);
+          db.allocateResource(disasterId, food.id, 2500);
         }
       }
     },
     {
-      agentName: 'Healthcare Agent',
-      actionType: 'MEDICAL_TRIAGE',
+      agentName: 'Medical Agent',
+      actionType: 'HEALTHCARE_TRIAGE',
       level: 'WARNING',
-      message: `MEDICAL DISPATCH: Sadar District Hospital reporting blood bank status 'LOW'. Dispatching field ambulance unit and notifying medical volunteers for emergency support duty.`,
+      message: `OUTPUT: Nearby hospitals queried. Narayana Medical Institute ICU capacity: 15/50 free. Sadar District Hospital general beds: 34 free. Dispatching 10 ambulances to high-risk zones. Prioritizing 8 severe trauma cases for ICU admission.`,
       delay: 1200,
       effect: () => {
         const hosp = db.getHospitals()[0];
         if (hosp) {
-          db.updateHospitalBeds(hosp.id, Math.max(0, hosp.icuBedsAvailable - 2), Math.max(0, hosp.generalBedsAvailable - 10));
+          db.updateHospitalBeds(hosp.id, Math.max(0, hosp.icuBedsAvailable - 8), Math.max(0, hosp.generalBedsAvailable - 15));
         }
       }
     },
     {
       agentName: 'Rescue Agent',
-      actionType: 'ROUTING_SOLVER',
+      actionType: 'ROUTE_OPTIMIZER',
       level: 'DECISION',
-      message: `NAVIGATION SOLVED: Safe dispatch route created. Bypassing active water levels along River Corridor. Routing NDRF Battalion 09 through High-Elevation highways. ETA: 28 minutes.`,
+      message: `OUTPUT: Rescue plan initialized. Generating optimized paths. AVOIDING: flooded lowlands and landslide structural blockages. Prioritizing: elderly, children, and disabled citizens. Dispatching NDRF Battalion 09. Route ETA: 22 minutes.`,
       delay: 1500,
       effect: () => {
         const activeTeam = db.getRescueTeams().find(t => t.type === 'AQUATIC' || t.type === 'GROUND_SEARCH');
@@ -121,27 +91,6 @@ export const generateSimulationSteps = (disasterId: string): SimulationStep[] =>
           db.deployTeam(activeTeam.id, disasterId);
         }
       }
-    },
-    {
-      agentName: 'Citizen Assistance Agent',
-      actionType: 'BROADCAST_PROTOCOLS',
-      level: 'INFO',
-      message: `ASSISTANCE DISPATCHED: Updating citizen chatbots with localized evacuation guides, shelter directions, and safety advisories in English and Hindi.`,
-      delay: 1000
-    },
-    {
-      agentName: 'Reporting Agent',
-      actionType: 'SITREP_COMPILATION',
-      level: 'INFO',
-      message: `REPORT GENERATED: Automated Government Situation Report (SITREP-01) drafted and queued for administrative approval. Analytical dashboard maps updated.`,
-      delay: 1000
-    },
-    {
-      agentName: 'Compliance Agent',
-      actionType: 'FACT_VALIDATION',
-      level: 'DECISION',
-      message: `COMPLIANCE CHECKS PASSED: Information verified against government IoT protocols. Zero misinformation clusters detected. Citizen emergency transmission signed and authenticated.`,
-      delay: 800
     }
   ];
 };
@@ -154,10 +103,8 @@ export const executeSimulation = async (
   
   // Set all agents to IDLE first
   const agentNames = [
-    'Monitoring Agent', 'Information Retrieval Agent', 'Planning Agent',
-    'Decision Support Agent', 'Shelter Agent', 'Resource Allocation Agent',
-    'Healthcare Agent', 'Rescue Agent', 'Citizen Assistance Agent',
-    'Reporting Agent', 'Compliance Agent'
+    'Weather Agent', 'Shelter Agent', 'Resource Allocation Agent',
+    'Medical Agent', 'Rescue Agent'
   ];
   
   for (const name of agentNames) {
@@ -177,11 +124,11 @@ export const executeSimulation = async (
     
     // Feed the timeline events table
     let category: 'DETECTION' | 'EVACUATION' | 'RESCUE' | 'MEDICAL' | 'RESOURCE' | 'RESOLVED' = 'DETECTION';
-    if (step.agentName === 'Planning Agent' || step.agentName === 'Shelter Agent') category = 'EVACUATION';
-    else if (step.agentName === 'Rescue Agent') category = 'RESCUE';
-    else if (step.agentName === 'Healthcare Agent') category = 'MEDICAL';
+    if (step.agentName === 'Weather Agent') category = 'DETECTION';
+    else if (step.agentName === 'Shelter Agent') category = 'EVACUATION';
     else if (step.agentName === 'Resource Allocation Agent') category = 'RESOURCE';
-    else if (step.agentName === 'Reporting Agent') category = 'RESOLVED';
+    else if (step.agentName === 'Medical Agent') category = 'MEDICAL';
+    else if (step.agentName === 'Rescue Agent') category = 'RESCUE';
 
     db.addTimelineEvent(
       `${step.agentName}: ${step.actionType.replace('_', ' ')}`,

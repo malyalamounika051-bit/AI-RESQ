@@ -313,17 +313,11 @@ export const INITIAL_VOLUNTEERS: Volunteer[] = [
 ];
 
 export const AGENT_CONFIGS: AgentConfig[] = [
-  { name: 'Monitoring Agent', role: 'IoT & Remote Sensing Specialist', goal: 'Continuously pull IoT gauges, weather feeds, and satellite alarms to identify onset disaster events.', status: 'IDLE', avatarColor: '#3b82f6' },
-  { name: 'Information Retrieval Agent', role: 'Context Aggregation & Verification Engine', goal: 'Gather live bed availabilities, shelter stocks, and weather telemetry surrounding the target area.', status: 'IDLE', avatarColor: '#10b981' },
-  { name: 'Planning Agent', role: 'Strategic Operations Planner', goal: 'Formulate predictive evacuation radiuses, risk grids, and shelter capacities to map optimal solutions.', status: 'IDLE', avatarColor: '#8b5cf6' },
-  { name: 'Decision Support Agent', role: 'Command Optimiser & Severity Ranker', goal: 'Weight risk vectors and resource needs to produce clear actionable summaries for administrators.', status: 'IDLE', avatarColor: '#f59e0b' },
-  { name: 'Shelter Agent', role: 'Geospatial Shelter Coordinator', goal: 'Compute nearest shelters, current occupancies, and reroute incoming evacuees to alternate nodes when full.', status: 'IDLE', avatarColor: '#ec4899' },
-  { name: 'Resource Allocation Agent', role: 'Logistics Optimization Solver', goal: 'Distribute assets (rations, tents, pumps) prioritizing high severity and affected density.', status: 'IDLE', avatarColor: '#14b8a6' },
-  { name: 'Healthcare Agent', role: 'Medical Logistics Coordinator', goal: 'Triage bed demands, assign ambulance routes, and monitor blood bank deficits across hospitals.', status: 'IDLE', avatarColor: '#ef4444' },
-  { name: 'Rescue Agent', role: 'Tactical Safe Route Planner', goal: 'Map navigation courses avoiding floods, forest fires, or landslide blockages for rescue teams.', status: 'IDLE', avatarColor: '#6366f1' },
-  { name: 'Citizen Assistance Agent', role: 'Interactive Support Operator', goal: 'Provide real-time guidelines, shelters, and collect incident reports directly from citizens.', status: 'IDLE', avatarColor: '#84cc16' },
-  { name: 'Reporting Agent', role: 'Compliance & Summary Documenter', goal: 'Generate standard Situation Reports (SITREPs) and analytics charts for NGOs and governments.', status: 'IDLE', avatarColor: '#6b7280' },
-  { name: 'Compliance Agent', role: 'Ethical Guardrail & Fact Validator', goal: 'Filter incoming reports to verify authenticity, prevent rumors, and enforce data privacy standards.', status: 'IDLE', avatarColor: '#4b5563' },
+  { name: 'Weather Agent', role: 'Meteorological & Remote Sensing Specialist', goal: 'Monitor forecasts, detect extreme storm levels / tremor thresholds, assign severity levels, and trigger workflows.', status: 'IDLE', avatarColor: '#3b82f6' },
+  { name: 'Shelter Agent', role: 'Geospatial Shelter Allocator', goal: 'Locate safe shelters, check occupancy, and automatically direct evacuees to alternatives if target shelter is full.', status: 'IDLE', avatarColor: '#ec4899' },
+  { name: 'Resource Allocation Agent', role: 'Logistics Optimization Specialist', goal: 'Compute required water packets, food packages, blankets, and rescue supplies, optimizing distribution based on impact indicators.', status: 'IDLE', avatarColor: '#10b981' },
+  { name: 'Medical Agent', role: 'Emergency Healthcare Coordinator', goal: 'Identify nearby hospital capacities, dispatch ambulance assets, predict emergency supply deficits, and prioritize critical patients.', status: 'IDLE', avatarColor: '#ef4444' },
+  { name: 'Rescue Agent', role: 'Tactical Evacuation Routing Solver', goal: 'Map rescue paths avoiding blocked/flooded grid sectors, prioritizing vulnerable citizens, and assigning responder units.', status: 'IDLE', avatarColor: '#6366f1' }
 ];
 
 // ========== NEW: Missing Persons ==========

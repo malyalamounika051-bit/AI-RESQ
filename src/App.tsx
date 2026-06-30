@@ -17,19 +17,12 @@ export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<string>('map');
   const [currentRole, setCurrentRole] = useState<string>('GOVERNMENT_OFFICER');
   
-  // Agent Statuses
   const [agentStatuses, setAgentStatuses] = useState<Record<string, 'IDLE' | 'ANALYZING' | 'DECIDING' | 'COMPLETED'>>({
-    'Monitoring Agent': 'IDLE',
-    'Information Retrieval Agent': 'IDLE',
-    'Planning Agent': 'IDLE',
-    'Decision Support Agent': 'IDLE',
+    'Weather Agent': 'IDLE',
     'Shelter Agent': 'IDLE',
     'Resource Allocation Agent': 'IDLE',
-    'Healthcare Agent': 'IDLE',
+    'Medical Agent': 'IDLE',
     'Rescue Agent': 'IDLE',
-    'Citizen Assistance Agent': 'IDLE',
-    'Reporting Agent': 'IDLE',
-    'Compliance Agent': 'IDLE',
   });
 
 
