@@ -8,7 +8,8 @@ import {
   Layers, 
   UserCheck,
   UserX,
-  Clock
+  Clock,
+  Activity
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -34,6 +35,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setCurrentRole
 }) => {
   const tabs = [
+    { id: 'overview', label: 'Overview Control', icon: Activity },
     { id: 'map', label: 'Live GIS Map', icon: Map },
     { id: 'dashboard', label: 'Role Analytics', icon: LayoutDashboard },
     { id: 'agents', label: 'AI Agent Console', icon: Cpu },

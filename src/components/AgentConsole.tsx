@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Cpu, Terminal } from 'lucide-react';
+import { Cpu, MessageSquare, ShieldAlert } from 'lucide-react';
 import { db } from '../data/mockDatabase';
 import { AGENT_CONFIGS, type AgentLog } from '../data/seedData';
 
@@ -10,7 +10,6 @@ interface AgentConsoleProps {
 export const AgentConsole: React.FC<AgentConsoleProps> = ({ agentStatuses }) => {
   const [logs, setLogs] = useState<AgentLog[]>(db.getAgentLogs());
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
-  const [filterLevel, setFilterLevel] = useState<string>('ALL');
 
   useEffect(() => {
     const unsubscribe = db.subscribe(() => {
@@ -21,53 +20,41 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({ agentStatuses }) => 
     };
   }, []);
 
-  const getStatusBadge = (status: 'IDLE' | 'ANALYZING' | 'DECIDING' | 'COMPLETED') => {
-    switch (status) {
-      case 'ANALYZING':
-        return <span className="bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded text-[10px] animate-pulse">ANALYZING</span>;
-      case 'DECIDING':
-        return <span className="bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded text-[10px] animate-bounce">DECIDING</span>;
-      case 'COMPLETED':
-        return <span className="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded text-[10px]">COMPLETED</span>;
-      default:
-        return <span className="bg-slate-800 text-slate-500 px-2 py-0.5 rounded text-[10px]">IDLE</span>;
-    }
-  };
-
-  const getLevelColor = (level: AgentLog['level']) => {
-    switch (level) {
-      case 'WARNING': return 'text-orange-400 border-orange-500/20 bg-orange-500/5';
-      case 'DECISION': return 'text-purple-400 border-purple-500/20 bg-purple-500/5';
-      case 'ERROR': return 'text-red-400 border-red-500/20 bg-red-500/5';
-      default: return 'text-slate-300 border-slate-700/50 bg-slate-800/10';
+  const getAgentColor = (name: string) => {
+    switch (name) {
+      case 'Weather Agent': return 'border-blue-500 text-blue-400 bg-blue-500/5';
+      case 'Shelter Agent': return 'border-pink-500 text-pink-400 bg-pink-500/5';
+      case 'Resource Allocation Agent': return 'border-green-500 text-green-400 bg-green-500/5';
+      case 'Medical Agent': return 'border-red-500 text-red-400 bg-red-500/5';
+      case 'Rescue Agent': return 'border-indigo-500 text-indigo-400 bg-indigo-500/5';
+      default: return 'border-slate-700 text-slate-400 bg-slate-800/10';
     }
   };
 
   const filteredLogs = logs.filter(log => {
     if (selectedAgent && log.agentName !== selectedAgent) return false;
-    if (filterLevel !== 'ALL' && log.level !== filterLevel) return false;
     return true;
   });
 
   return (
-    <div className="flex h-[calc(100vh-5rem)] bg-slate-950 text-slate-100 overflow-hidden">
-      {/* Left panel - Agent Directories & Status */}
-      <div className="w-80 border-r border-slate-800 bg-slate-900/60 p-6 overflow-y-auto">
+    <div className="flex h-[calc(100vh-5rem)] bg-slate-950 text-slate-100 overflow-hidden font-sans">
+      {/* Left panel - Agent Directories */}
+      <div className="w-80 border-r border-slate-900 bg-slate-950/60 p-6 overflow-y-auto hidden md:block">
         <div className="flex items-center gap-2 mb-6">
           <Cpu className="w-5 h-5 text-indigo-500" />
-          <h2 className="text-lg font-bold tracking-tight text-white">Agent Directory</h2>
+          <h2 className="text-sm font-bold tracking-tight text-white uppercase">Agent Roster</h2>
         </div>
         
         <div className="space-y-2">
           <button
             onClick={() => setSelectedAgent(null)}
-            className={`w-full text-left px-3 py-2.5 rounded-lg text-xs font-semibold border transition-all duration-150 ${
+            className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold border transition-all duration-150 cursor-pointer ${
               selectedAgent === null
-                ? 'bg-indigo-600/15 border-indigo-500/30 text-white'
-                : 'bg-transparent border-transparent text-slate-400 hover:bg-slate-800/40'
+                ? 'bg-slate-900 border-slate-800 text-white shadow-md'
+                : 'bg-transparent border-transparent text-slate-400 hover:bg-slate-900/40'
             }`}
           >
-            All Swarm Agents
+            All Swarm Feed
           </button>
           
           {AGENT_CONFIGS.map(agent => {
@@ -77,73 +64,64 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({ agentStatuses }) => 
               <button
                 key={agent.name}
                 onClick={() => setSelectedAgent(agent.name)}
-                className={`w-full text-left p-3 rounded-lg border transition-all duration-150 ${
+                className={`w-full text-left p-3 rounded-xl border transition-all duration-150 cursor-pointer ${
                   isSelected 
-                    ? 'bg-slate-800 border-slate-700 text-white shadow-inner' 
-                    : 'bg-slate-900/40 border-slate-800/60 text-slate-400 hover:bg-slate-800/20'
+                    ? 'bg-slate-900 border-slate-800 text-white shadow-md' 
+                    : 'bg-transparent border-transparent text-slate-400 hover:bg-slate-900/20'
                 }`}
               >
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="font-semibold text-xs text-white" style={{ borderLeft: `2.5px solid ${agent.avatarColor}`, paddingLeft: '6px' }}>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-bold text-xs text-white">
                     {agent.name}
                   </span>
-                  {getStatusBadge(status)}
+                  <span className={`text-[9px] px-1.5 py-0.5 rounded font-black uppercase ${
+                    status === 'COMPLETED' ? 'bg-emerald-500/10 text-emerald-400' : 
+                    status === 'ANALYZING' || status === 'DECIDING' ? 'bg-indigo-500/10 text-indigo-400 animate-pulse' : 
+                    'bg-slate-900 text-slate-500'
+                  }`}>
+                    {status}
+                  </span>
                 </div>
-                <p className="text-[10px] text-slate-500 leading-normal line-clamp-2">{agent.goal}</p>
+                <p className="text-[10px] text-slate-500 leading-normal line-clamp-2 font-medium">{agent.goal}</p>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Right panel - Stream Logs */}
+      {/* Right panel - Streaming Feeds */}
       <div className="flex-1 flex flex-col min-w-0 bg-slate-950">
-        <div className="p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/20">
-          <div className="flex items-center gap-3">
-            <Terminal className="w-5 h-5 text-emerald-500" />
-            <div>
-              <h2 className="text-base font-bold text-white">Swarm Logic Console</h2>
-              <p className="text-xs text-slate-500">Autonomous workflow logs (LangGraph-equivalent trace)</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <select
-              value={filterLevel}
-              onChange={(e) => setFilterLevel(e.target.value)}
-              className="bg-slate-800 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700 focus:outline-none"
-            >
-              <option value="ALL">All Levels</option>
-              <option value="INFO">Info</option>
-              <option value="WARNING">Warnings</option>
-              <option value="DECISION">Decisions</option>
-              <option value="ERROR">Errors</option>
-            </select>
+        <div className="p-6 border-b border-slate-900 flex items-center gap-3 bg-slate-950/40">
+          <MessageSquare className="w-5 h-5 text-indigo-400" />
+          <div>
+            <h2 className="text-sm font-bold text-white uppercase tracking-wider">Swarm Activity Feed</h2>
+            <p className="text-[10px] text-slate-500 font-medium">Real-time collaborative planning logs.</p>
           </div>
         </div>
 
-        <div className="flex-1 p-6 overflow-y-auto space-y-3 font-mono text-xs">
+        <div className="flex-1 p-6 overflow-y-auto space-y-4">
           {filteredLogs.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-slate-600 space-y-2">
-              <Terminal className="w-8 h-8" />
-              <span>Console quiet. Trigger a disaster scenario to boot up the agent swarm.</span>
+            <div className="h-full flex flex-col items-center justify-center text-slate-600 space-y-2 font-mono text-xs">
+              <ShieldAlert className="w-6 h-6 animate-pulse" />
+              <span>Console awaiting action. Run AI Coordination from Overview tab.</span>
             </div>
           ) : (
             filteredLogs.map(log => (
               <div 
                 key={log.id} 
-                className={`p-3.5 rounded-lg border transition-all duration-150 flex items-start gap-3 ${getLevelColor(log.level)}`}
+                className={`p-4 rounded-xl border flex gap-3 text-xs shadow-sm max-w-2xl ${getAgentColor(log.agentName)}`}
               >
-                <div className="flex-none bg-slate-900/60 p-1.5 rounded border border-slate-800 text-[10px] text-slate-400">
-                  {new Date(log.timestamp).toLocaleTimeString()}
+                <div className="w-8 h-8 rounded-full bg-slate-950 flex items-center justify-center font-bold font-mono text-[10px] border border-slate-800 flex-none text-white">
+                  {log.agentName.split(' ').map(n => n[0]).join('')}
                 </div>
-                <div className="flex-1 space-y-1">
+                <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-white text-[11px] bg-slate-800 px-1.5 py-0.5 rounded">{log.agentName}</span>
-                    <span className="text-[10px] text-slate-400 bg-slate-900 px-1.5 py-0.5 rounded">{log.actionType}</span>
-                    <span className="text-[10px] font-bold tracking-wider">{log.level}</span>
+                    <span className="font-bold text-white text-xs">{log.agentName}</span>
+                    <span className="text-[9px] bg-slate-950 px-1.5 py-0.5 rounded text-slate-500 font-mono">
+                      {new Date(log.timestamp).toLocaleTimeString()}
+                    </span>
                   </div>
-                  <p className="text-slate-300 leading-relaxed whitespace-pre-line text-[11px]">{log.message}</p>
+                  <p className="text-slate-300 leading-normal font-medium">{log.message}</p>
                 </div>
               </div>
             ))
@@ -153,4 +131,5 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({ agentStatuses }) => 
     </div>
   );
 };
+
 export default AgentConsole;

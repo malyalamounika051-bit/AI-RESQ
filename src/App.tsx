@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import LandingPage from './components/LandingPage';
 import Sidebar from './components/Sidebar';
 import TopNav from './components/TopNav';
 import MapModule from './components/MapModule';
@@ -6,6 +7,7 @@ import AgentConsole from './components/AgentConsole';
 import ChatAssistant from './components/ChatAssistant';
 import MissingPersons from './components/MissingPersons';
 import DisasterTimeline from './components/DisasterTimeline';
+import OverviewTab from './dashboards/OverviewTab';
 import GovernmentDashboard from './dashboards/GovernmentDashboard';
 import CitizenDashboard from './dashboards/CitizenDashboard';
 import VolunteerDashboard from './dashboards/VolunteerDashboard';
@@ -14,7 +16,8 @@ import HospitalDashboard from './dashboards/HospitalDashboard';
 import AdminDashboard from './dashboards/AdminDashboard';
 
 export const App: React.FC = () => {
-  const [currentTab, setCurrentTab] = useState<string>('map');
+  const [showLanding, setShowLanding] = useState<boolean>(true);
+  const [currentTab, setCurrentTab] = useState<string>('overview');
   const [currentRole, setCurrentRole] = useState<string>('GOVERNMENT_OFFICER');
   
   const [agentStatuses, setAgentStatuses] = useState<Record<string, 'IDLE' | 'ANALYZING' | 'DECIDING' | 'COMPLETED'>>({
@@ -24,8 +27,6 @@ export const App: React.FC = () => {
     'Medical Agent': 'IDLE',
     'Rescue Agent': 'IDLE',
   });
-
-
 
   const renderDashboardByRole = () => {
     switch (currentRole) {
@@ -46,6 +47,8 @@ export const App: React.FC = () => {
 
   const renderContent = () => {
     switch (currentTab) {
+      case 'overview':
+        return <OverviewTab setAgentStatuses={setAgentStatuses} agentStatuses={agentStatuses} />;
       case 'dashboard':
         return renderDashboardByRole();
       case 'agents':
@@ -61,6 +64,10 @@ export const App: React.FC = () => {
     }
   };
 
+  if (showLanding) {
+    return <LandingPage onEnterConsole={() => setShowLanding(false)} />;
+  }
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-slate-950">
       {/* Sidebar navigation */}
@@ -75,14 +82,14 @@ export const App: React.FC = () => {
       <div className="flex-1 flex flex-col min-w-0">
         <TopNav
           onSimulationStarted={() => {
-            setCurrentTab('agents'); // Switch to agent console so they can watch the logs live
+            setCurrentTab('agents');
           }}
           onSimulationFinished={() => {
           }}
           setAgentStatuses={setAgentStatuses}
         />
         
-        <main className="flex-1 min-h-0 bg-slate-950 relative">
+        <main className="flex-1 min-h-0 bg-slate-950 relative overflow-y-auto px-8 py-6">
           {renderContent()}
         </main>
       </div>
